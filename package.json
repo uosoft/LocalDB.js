@@ -1,0 +1,32 @@
+{
+  "name": "localdb",
+  "version": "1.0.0",
+  "description": "A lightweight, in-browser local database with standard SQL syntax support",
+  "main": "localdb.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "database",
+    "sql",
+    "localstorage",
+    "javascript",
+    "browser",
+    "lightweight"
+  ],
+  "author": "UO Soft <uosoft@uosoft.net>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/localdb.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/localdb/issues"
+  },
+  "homepage": "https://github.com/yourusername/localdb#readme",
+  "files": [
+    "localdb.js",
+    "LICENSE",
+    "README.md"
+  ]
+}

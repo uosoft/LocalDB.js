@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LocalDB.js Sample</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            color: rgba(255,255,255,0.9);
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .section h3 {
+            color: #667eea;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            min-height: 100px;
+            font-family: 'Courier New', monospace;
+            flex-basis: 100%;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #764ba2;
+        }
+
+        button.danger {
+            background: #e74c3c;
+        }
+
+        button.danger:hover {
+            background: #c0392b;
+        }
+
+        .result {
+            background: #f5f5f5;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .result.error {
+            border-left-color: #e74c3c;
+            background: #fef5f5;
+            color: #e74c3c;
+        }
+
+        .result.success {
+            border-left-color: #27ae60;
+            background: #f0fdf4;
+            color: #27ae60;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            font-weight: bold;
+        }
+
+        tr:hover {
+            background: #f9f9f9;
+        }
+
+        .info {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            color: #1976d2;
+            font-size: 0.95em;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            input[type="text"],
+            input[type="number"],
+            textarea {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗄️ LocalDB.js</h1>
+        <p class="subtitle">A local database with standard SQL syntax support</p>
+
+        <!-- Create Sample Tables Section -->
+        <div class="section">
+            <h2>Create Sample Tables</h2>
+            <div class="info">
+                💡 Automatically create sample tables (users, products, orders).
+            </div>
+            <div class="button-group">
+                <button onclick="createSampleTables()">Create Sample Tables</button>
+            </div>
+            <div id="createResult" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- データ操作セクション -->
+        <div class="section">
+            <h2>Insert, Update, Delete Data</h2>
+            <div class="info">
+                💡 You can manage users, products, and orders data.
+            </div>
+            <div class="grid-2">
+                <!-- Add User -->
+                <div>
+                    <h3>Add User</h3>
+                    <div class="input-group">
+                        <input type="number" id="userId" placeholder="ID" min="1">
+                        <input type="text" id="userName" placeholder="Name">
+                        <input type="number" id="userAge" placeholder="Age" min="1">
+                    </div>
+                    <button onclick="addUser()" style="width: 100%;">Add User</button>
+                    <div id="insertResult" class="result" style="display: none;"></div>
+                </div>
+
+                <!-- Add Product -->
+                <div>
+                    <h3>Add Product</h3>
+                    <div class="input-group">
+                        <input type="number" id="productId" placeholder="ID" min="1">
+                        <input type="text" id="productName" placeholder="Product Name">
+                        <input type="number" id="productPrice" placeholder="Price" min="0">
+                    </div>
+                    <button onclick="addProduct()" style="width: 100%;">Add Product</button>
+                    <div id="insertProductResult" class="result" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SQL Query Execution Section -->
+        <div class="section">
+            <h2>SQL Query Execution</h2>
+            <div class="info">
+                💡 Execute queries using standard SQL syntax.<br>
+                対応機能：SELECT, INSERT, UPDATE, DELETE, ORDER BY, LIMIT, DISTINCT, WHERE, JOIN, UNION, Subqueries, EXISTS など
+            </div>
+            <div class="input-group">
+                <textarea id="queryInput" placeholder="E.g. SELECT * FROM users&#10;E.g. SELECT * FROM users WHERE id IN (SELECT user_id FROM orders)&#10;E.g. SELECT * FROM users WHERE age > (SELECT AVG(age) FROM users)&#10;E.g. SELECT * FROM (SELECT * FROM users WHERE age > 25) AS young_users"></textarea>
+            </div>
+            <button onclick="executeQuery()" style="width: 100%;">Execute Query</button>
+            <div id="queryResult" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- Preset Queries Section -->
+        <div class="section">
+            <h2>Preset Queries</h2>
+            
+            <h3>📋 Basic SELECT</h3>
+            <div class="button-group">
+                <button onclick="presetQuery('SELECT * FROM users')">Show All Users</button>
+                <button onclick="presetQuery('SELECT * FROM products')">Show All Products</button>
+                <button onclick="presetQuery('SELECT * FROM orders')">Show All Orders</button>
+            </div>
+
+            <h3>🔢 ORDER BY（ソート）</h3>
+            <div class="button-group">
+                <button onclick="presetQuery('SELECT * FROM users ORDER BY age DESC')">Users sorted by Age (Descending)</button>
+                <button onclick="presetQuery('SELECT * FROM products ORDER BY price ASC')">Products sorted by Price (Ascending)</button>
+                <button onclick="presetQuery('SELECT * FROM users ORDER BY age DESC, name ASC')">Sort by Age (Desc), Name (Asc)</button>
+            </div>
+
+            <h3>⏱️ LIMIT（records数制限）</h3>
+            <div class="button-group">
+                <button onclick="presetQuery('SELECT * FROM users LIMIT 2')">First 2 Users</button>
+                <button onclick="presetQuery('SELECT * FROM products ORDER BY price DESC LIMIT 3')">Top 3 Most Expensive Products</button>
+                <button onclick="presetQuery('SELECT * FROM users LIMIT 1 OFFSET 1')">Second User</button>
+            </div>
+
+            <h3>✨ DISTINCT（重複排除）</h3>
+            <div class="button-group">
+                <button onclick="presetQuery('SELECT DISTINCT age FROM users')">Distinct User Ages (No Duplicates)</button>
+                <button onclick="presetQuery('SELECT DISTINCT user_id FROM orders')">User IDs that Made Orders</button>
+            </div>
+
+            <h3>🔍 WHERE条records（様々な演算子）</h3>
+            <div class="button-group">
+                <button onclick="presetQuery('SELECT * FROM users WHERE age > 25')">Users Aged 25 or Older</button>
+                <button onclick="presetQuery('SELECT * FROM products WHERE price BETWEEN 5000 AND 20000')">Products Priced 5000-20000</button>
+                <button onclick="presetQuery(`SELECT * FROM users WHERE name LIKE 'T%'`)">Users Whose Name Starts with "T"</button>
+                <button onclick="presetQuery('SELECT * FROM users WHERE age IN (20, 25, 30)')">Users with Age in (20, 25, 30)</button>
+            </div>
+
+            <h3>🔗 JOIN (Combining Tables)</h3>
+            <div class="button-group">
+                <button onclick="presetQuery('SELECT users.name, orders.id FROM users INNER JOIN orders ON users.id = orders.user_id')">User names and order IDs</button>
+                <button onclick="presetQuery('SELECT * FROM users LEFT JOIN orders ON users.id = orders.user_id')">All users and their order information</button>
+            </div>
+
+            <h3>🔀 UNION (Combining Results)</h3>
+            <div class="button-group">
+                <button onclick="presetQuery('SELECT name FROM users UNION SELECT name FROM employees')">Names from Users and Employees (No Duplicates)</button>
+                <button onclick="presetQuery('SELECT name FROM users UNION ALL SELECT name FROM employees')">Names from Users and Employees (With Duplicates)</button>
+                <button onclick="presetQuery('SELECT id, name FROM users UNION SELECT id, name FROM employees')">Users and Employees (ID, Name)</button>
+                <button onclick="presetQuery('SELECT name FROM users WHERE age > 25 UNION SELECT name FROM employees UNION SELECT name FROM contractors')">Names from 3 Tables Combined</button>
+                <button onclick="presetQuery('SELECT name FROM employees UNION ALL SELECT name FROM contractors')">Names from Employees and Contractors (With Duplicates)</button>
+            </div>
+
+            <h3>🔍 Subqueries</h3>
+            <div class="button-group">
+                <button onclick="presetQuery('SELECT * FROM users WHERE id IN (SELECT user_id FROM orders)')">Users who made orders (IN subquery)</button>
+                <button onclick="presetQuery('SELECT * FROM users WHERE id NOT IN (SELECT user_id FROM orders)')">Users who did NOT make orders (NOT IN subquery)</button>
+                <button onclick="presetQuery('SELECT * FROM orders WHERE user_id IN (SELECT id FROM users WHERE age > 25)')">Orders from users aged 25+</button>
+                <button onclick="presetQuery('SELECT * FROM products WHERE price > (SELECT AVG(price) FROM products)')">Products Above Average Price</button>
+                <button onclick="presetQuery('SELECT * FROM users WHERE id IN (SELECT user_id FROM orders) AND age > 25')">Users 25+ who made orders</button>
+            </div>
+
+            <h3>📊 集計（GROUP BY）</h3>
+            <div class="button-group">
+                <button onclick="presetQuery('SELECT user_id, COUNT(*) as order_count FROM orders GROUP BY user_id')">Order Count per User</button>
+            </div>
+
+            <h3>🔍 EXISTS（サブクエリ）</h3>
+            <div class="button-group">
+                <button onclick="presetQuery('SELECT * FROM users WHERE EXISTS (SELECT 1 FROM orders WHERE orders.user_id = users.id)')">Users Who Made Orders</button>
+                <button onclick="presetQuery('SELECT * FROM users WHERE NOT EXISTS (SELECT 1 FROM orders WHERE orders.user_id = users.id)')">Users Who Did NOT Make Orders</button>
+            </div>
+
+            <h3>✏️ UPDATE/DELETE</h3>
+            <div class="button-group">
+                <button onclick="presetQuery('UPDATE users SET age = 35 WHERE id = 1')">Update User ID 1 Age to 35</button>
+                <button onclick="presetQuery('DELETE FROM orders WHERE user_id = 3')">Delete Orders for User ID 3</button>
+            </div>
+        </div>
+
+        <!-- データベース管理セクション -->
+        <div class="section">
+            <h2>データベース管理</h2>
+            <div class="button-group">
+                <button onclick="showTables()">Show Tables</button>
+                <button onclick="showSchema()">Show Schema</button>
+                <button onclick="clearDatabase()" class="danger">Clear All Data</button>
+            </div>
+            <div id="manageResult" class="result" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script src="localdb.js"></script>
+    <script>
+        // Create LocalDB instance
+        const db = new LocalDB('sampleDB');
+
+        // Function to display results
+        function showResult(elementId, result, isError = false) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = `result ${isError ? 'error' : 'success'}`;
+
+            if (typeof result === 'string') {
+                element.textContent = result;
+            } else if (Array.isArray(result)) {
+                if (result.length === 0) {
+                    element.textContent = 'No results';
+                } else {
+                    let html = '<table><tr>';
+                    Object.keys(result[0]).forEach(key => {
+                        html += `<th>${key}</th>`;
+                    });
+                    html += '</tr>';
+                    result.forEach(row => {
+                        html += '<tr>';
+                        Object.values(row).forEach(val => {
+                            html += `<td>${val !== null && val !== undefined ? val : 'NULL'}</td>`;
+                        });
+                        html += '</tr>';
+                    });
+                    html += '</table>';
+                    element.innerHTML = html;
+                }
+            } else if (typeof result === 'object') {
+                element.textContent = JSON.stringify(result, null, 2);
+            }
+        }
+
+        // サンプルCreate Sample Tables
+        function createSampleTables() {
+            try {
+                db.clear();
+
+                // Users table
+                db.execute('CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT, age INTEGER)');
+                db.execute("INSERT INTO users (id, name, age) VALUES (1, 'Taro', 30)");
+                db.execute("INSERT INTO users (id, name, age) VALUES (2, 'Hanako', 28)");
+                db.execute("INSERT INTO users (id, name, age) VALUES (3, 'Jiro', 22)");
+                db.execute("INSERT INTO users (id, name, age) VALUES (4, 'Tomoe', 35)");
+
+                // Products table
+                db.execute('CREATE TABLE products (id INTEGER PRIMARY KEY, name TEXT, price INTEGER)');
+                db.execute("INSERT INTO products (id, name, price) VALUES (1, 'Laptop', 150000)");
+                db.execute("INSERT INTO products (id, name, price) VALUES (2, 'Mouse', 3000)");
+                db.execute("INSERT INTO products (id, name, price) VALUES (3, 'Keyboard', 8000)");
+                db.execute("INSERT INTO products (id, name, price) VALUES (4, 'Monitor', 25000)");
+
+                // Orders table
+                db.execute('CREATE TABLE orders (id INTEGER PRIMARY KEY, user_id INTEGER, product_id INTEGER, quantity INTEGER)');
+                db.execute("INSERT INTO orders (id, user_id, product_id, quantity) VALUES (1, 1, 1, 1)");
+                db.execute("INSERT INTO orders (id, user_id, product_id, quantity) VALUES (2, 1, 2, 2)");
+                db.execute("INSERT INTO orders (id, user_id, product_id, quantity) VALUES (3, 2, 3, 1)");
+                db.execute("INSERT INTO orders (id, user_id, product_id, quantity) VALUES (4, 2, 4, 1)");
+                db.execute("INSERT INTO orders (id, user_id, product_id, quantity) VALUES (5, 4, 1, 3)");
+
+                // Employees table (for UNION)
+                db.execute('CREATE TABLE employees (id INTEGER PRIMARY KEY, name TEXT, department TEXT)');
+                db.execute("INSERT INTO employees (id, name, department) VALUES (101, 'Saburo', 'Sales')");
+                db.execute("INSERT INTO employees (id, name, department) VALUES (102, 'Yukiko', 'HR')");
+                db.execute("INSERT INTO employees (id, name, department) VALUES (103, 'Tomoe', 'IT')");
+                db.execute("INSERT INTO employees (id, name, department) VALUES (104, 'Riku', 'Finance')");
+
+                // Contractors table (for UNION)
+                db.execute('CREATE TABLE contractors (id INTEGER PRIMARY KEY, name TEXT, company TEXT)');
+                db.execute("INSERT INTO contractors (id, name, company) VALUES (201, 'Hanako', 'TechCorp')");
+                db.execute("INSERT INTO contractors (id, name, company) VALUES (202, 'Jiro', 'DesignStudio')");
+                db.execute("INSERT INTO contractors (id, name, company) VALUES (203, 'Taro', 'ConsultingGroup')");
+
+                showResult('createResult', '✅ Sample tables created successfully!\nusers: 4 records\nproducts: 4 records\norders: 5 records\nemployees: 4 records\ncontractors: 3 records');
+            } catch (error) {
+                showResult('createResult', `❌ Error: ${error.message}`, true);
+            }
+        }
+
+        // Add User
+        function addUser() {
+            try {
+                const id = document.getElementById('userId').value;
+                const name = document.getElementById('userName').value;
+                const age = document.getElementById('userAge').value;
+
+                if (!id || !name || !age) {
+                    showResult('insertResult', '❌ Please fill in all fields', true);
+                    return;
+                }
+
+                db.execute(`INSERT INTO users (id, name, age) VALUES (${id}, '${name}', ${age})`);
+                showResult('insertResult', `✅ User "${name}" added successfully`);
+
+                document.getElementById('userId').value = '';
+                document.getElementById('userName').value = '';
+                document.getElementById('userAge').value = '';
+            } catch (error) {
+                showResult('insertResult', `❌ Error: ${error.message}`, true);
+            }
+        }
+
+        // Add Product
+        function addProduct() {
+            try {
+                const id = document.getElementById('productId').value;
+                const name = document.getElementById('productName').value;
+                const price = document.getElementById('productPrice').value;
+
+                if (!id || !name || !price) {
+                    showResult('insertProductResult', '❌ Please fill in all fields', true);
+                    return;
+                }
+
+                db.execute(`INSERT INTO products (id, name, price) VALUES (${id}, '${name}', ${price})`);
+                showResult('insertProductResult', `✅ Product "${name}" added successfully`);
+
+                document.getElementById('productId').value = '';
+                document.getElementById('productName').value = '';
+                document.getElementById('productPrice').value = '';
+            } catch (error) {
+                showResult('insertProductResult', `❌ Error: ${error.message}`, true);
+            }
+        }
+
+        // Execute SQL Query
+        function executeQuery() {
+            try {
+                const query = document.getElementById('queryInput').value.trim();
+                if (!query) {
+                    showResult('queryResult', '❌ Please enter a query', true);
+                    return;
+                }
+
+                const result = db.execute(query);
+                showResult('queryResult', result);
+            } catch (error) {
+                showResult('queryResult', `❌ Error: ${error.message}`, true);
+            }
+        }
+
+        // Execute Preset Query
+        function presetQuery(query) {
+            document.getElementById('queryInput').value = query;
+            executeQuery();
+        }
+
+        // Show Tables
+        function showTables() {
+            try {
+                const tables = db.getTables();
+                if (tables.length === 0) {
+                    showResult('manageResult', '❌ No tables found');
+                    return;
+                }
+
+                let message = '📊 Existing Tables:\n\n';
+                tables.forEach(table => {
+                    const data = db.getTableData(table);
+                    message += `${table}: ${data.length}records\n`;
+                });
+
+                showResult('manageResult', message);
+            } catch (error) {
+                showResult('manageResult', `❌ Error: ${error.message}`, true);
+            }
+        }
+
+        // Show Schema
+        function showSchema() {
+            try {
+                const tables = db.getTables();
+                if (tables.length === 0) {
+                    showResult('manageResult', '❌ No tables found');
+                    return;
+                }
+
+                let message = '📋 Schema Information:\n\n';
+                tables.forEach(table => {
+                    const schema = db.tables[table];
+                    message += `${table}:\n`;
+                    Object.keys(schema.columns).forEach(col => {
+                        message += `  ${col}: ${schema.columns[col]}\n`;
+                    });
+                    message += '\n';
+                });
+
+                showResult('manageResult', message);
+            } catch (error) {
+                showResult('manageResult', `❌ Error: ${error.message}`, true);
+            }
+        }
+
+        // Clear Database
+        function clearDatabase() {
+            if (confirm('Are you sure you want to delete all data?')) {
+                try {
+                    db.clear();
+                    showResult('manageResult', '✅ Database cleared successfully');
+                } catch (error) {
+                    showResult('manageResult', `❌ Error: ${error.message}`, true);
+                }
+            }
+        }
+
+        // ページロード時の処理
+        window.addEventListener('load', () => {
+            console.log('LocalDB.js has been loaded');
+            console.log('対応機能: ORDER BY, LIMIT, DISTINCT, LIKE, IN, BETWEEN, JOIN, EXISTS, GROUP BY など');
+        });
+    </script>
+</body>
+</html>
