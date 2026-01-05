@@ -5,7 +5,7 @@
 
 > A lightweight, in-browser local database system with standard SQL syntax support.
 
-**Copyright (c) 2024 UO Soft (uosoft@uosoft.net)**  
+**Copyright (c) UO Soft (uosoft@uosoft.net)**  
 Licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
@@ -404,16 +404,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - JOIN and subquery support
 - UNION and UNION ALL support
 - localStorage persistence
-
-## Roadmap
-
-- [ ] Transaction support
-- [ ] Indexing for performance
-- [ ] More aggregate functions
-- [ ] Window functions
-- [ ] Enhanced error messages
-- [ ] Query builder API
-- [ ] Data export (JSON, CSV)
 
 ## Credits
 

@@ -13,7 +13,7 @@
  * 
  * MIT License
  * 
- * Copyright (c) 2024 UO Soft (uosoft@uosoft.net)
+ * Copyright (c) UO Soft (uosoft@uosoft.net)
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -820,8 +820,43 @@ class LocalDB {
       return this.evaluateExistsCondition(row, whereClause, existsMatch, tableName);
     }
 
+    // IN/NOT INを括弧のネストに対応して保護
+    const protectedConditions = [];
+    let protectedIndex = 0;
+    let processedClause = '';
+    let i = 0;
+
+    while (i < whereClause.length) {
+      // IN または NOT IN を検出
+      const inMatch = whereClause.substr(i).match(/^(\w+\s+(?:NOT\s+)?IN\s*\()/i);
+      
+      if (inMatch) {
+        // 括弧の開始位置を見つける
+        const parenStart = i + inMatch[0].length - 1;
+        let parenDepth = 1;
+        let j = parenStart + 1;
+
+        // マッチする閉じ括弧を見つける
+        while (j < whereClause.length && parenDepth > 0) {
+          if (whereClause[j] === '(') parenDepth++;
+          else if (whereClause[j] === ')') parenDepth--;
+          j++;
+        }
+
+        // IN条件全体を保護
+        const inCondition = whereClause.substring(i, j);
+        protectedConditions.push(inCondition);
+        processedClause += `__PROTECTED_${protectedIndex++}__`;
+        i = j;
+      } else {
+        // IN/NOT INが見つからない場合は通常の文字をコピー
+        processedClause += whereClause[i];
+        i++;
+      }
+    }
+
     // 基本的な条件をAND/ORで分割
-    const conditions = whereClause.split(/\s+(AND|OR)\s+/i);
+    const conditions = processedClause.split(/\s+(AND|OR)\s+/i);
     let result = true;
     let operator = 'AND';
 
@@ -837,7 +872,13 @@ class LocalDB {
         continue;
       }
 
-      const conditionResult = this.evaluateCondition(row, condition.trim(), tableName);
+      // 保護されていた条件を復元
+      let actualCondition = condition.trim();
+      for (let j = 0; j < protectedConditions.length; j++) {
+        actualCondition = actualCondition.replace(`__PROTECTED_${j}__`, protectedConditions[j]);
+      }
+
+      const conditionResult = this.evaluateCondition(row, actualCondition, tableName);
 
       if (operator === 'AND') {
         result = result && conditionResult;
@@ -939,6 +980,31 @@ class LocalDB {
       return regex.test(String(row[col] || ''));
     }
 
+    // NOT IN演算子（サブクエリ対応）★ INより先にチェック！
+    const notInMatch = condition.match(/(\w+)\s+NOT\s+IN\s*\((.*?)\)(?:\s|$)/i);
+    if (notInMatch) {
+      const col = notInMatch[1];
+      const innerContent = notInMatch[2].trim();
+      
+      // サブクエリかどうかを判定
+      if (innerContent.toUpperCase().startsWith('SELECT')) {
+        // サブクエリの場合
+        try {
+          const subqueryResult = this.execute(innerContent);
+          const values = Array.isArray(subqueryResult) ? subqueryResult.map(r => {
+            return Object.values(r)[0];
+          }) : [subqueryResult];
+          return !values.includes(row[col]);
+        } catch (error) {
+          throw new Error(`Subquery error in NOT IN: ${error.message}`);
+        }
+      } else {
+        // 通常の値リストの場合
+        const values = innerContent.split(',').map(v => this.parseValue(v.trim()));
+        return !values.includes(row[col]);
+      }
+    }
+
     // IN演算子（サブクエリ対応）
     const inMatch = condition.match(/(\w+)\s+IN\s*\((.*?)\)(?:\s|$)/i);
     if (inMatch) {
@@ -965,33 +1031,8 @@ class LocalDB {
       }
     }
 
-    // NOT IN演算子（サブクエリ対応）
-    const notInMatch = condition.match(/(\w+)\s+NOT\s+IN\s*\((.*?)\)(?:\s|$)/i);
-    if (notInMatch) {
-      const col = notInMatch[1];
-      const innerContent = notInMatch[2].trim();
-      
-      // サブクエリかどうかを判定
-      if (innerContent.toUpperCase().startsWith('SELECT')) {
-        // サブクエリの場合
-        try {
-          const subqueryResult = this.execute(innerContent);
-          const values = Array.isArray(subqueryResult) ? subqueryResult.map(r => {
-            return Object.values(r)[0];
-          }) : [subqueryResult];
-          return !values.includes(row[col]);
-        } catch (error) {
-          throw new Error(`Subquery error in NOT IN: ${error.message}`);
-        }
-      } else {
-        // 通常の値リストの場合
-        const values = innerContent.split(',').map(v => this.parseValue(v.trim()));
-        return !values.includes(row[col]);
-      }
-    }
-
     // BETWEEN演算子
-    const betweenMatch = condition.match(/(\w+)\s+BETWEEN\s+(.+?)\s+AND\s+(.+)/i);
+    const betweenMatch = condition.match(/(\w+)\s+BETWEEN\s+(.+?)\s+AND\s+(.+?)(?=\s*$)/i);
     if (betweenMatch) {
       const col = betweenMatch[1];
       const min = this.parseValue(betweenMatch[2]);

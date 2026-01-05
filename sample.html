@@ -222,7 +222,7 @@
             <div id="createResult" class="result" style="display: none;"></div>
         </div>
 
-        <!-- データ操作セクション -->
+        <!-- Data Manipulation Section -->
         <div class="section">
             <h2>Insert, Update, Delete Data</h2>
             <div class="info">
@@ -260,7 +260,7 @@
             <h2>SQL Query Execution</h2>
             <div class="info">
                 💡 Execute queries using standard SQL syntax.<br>
-                対応機能：SELECT, INSERT, UPDATE, DELETE, ORDER BY, LIMIT, DISTINCT, WHERE, JOIN, UNION, Subqueries, EXISTS など
+                Supported features: SELECT, INSERT, UPDATE, DELETE, ORDER BY, LIMIT, DISTINCT, WHERE, JOIN, UNION, Subqueries, EXISTS, etc.
             </div>
             <div class="input-group">
                 <textarea id="queryInput" placeholder="E.g. SELECT * FROM users&#10;E.g. SELECT * FROM users WHERE id IN (SELECT user_id FROM orders)&#10;E.g. SELECT * FROM users WHERE age > (SELECT AVG(age) FROM users)&#10;E.g. SELECT * FROM (SELECT * FROM users WHERE age > 25) AS young_users"></textarea>
@@ -280,27 +280,27 @@
                 <button onclick="presetQuery('SELECT * FROM orders')">Show All Orders</button>
             </div>
 
-            <h3>🔢 ORDER BY（ソート）</h3>
+            <h3>📊 ORDER BY (Sorting)</h3>
             <div class="button-group">
                 <button onclick="presetQuery('SELECT * FROM users ORDER BY age DESC')">Users sorted by Age (Descending)</button>
                 <button onclick="presetQuery('SELECT * FROM products ORDER BY price ASC')">Products sorted by Price (Ascending)</button>
                 <button onclick="presetQuery('SELECT * FROM users ORDER BY age DESC, name ASC')">Sort by Age (Desc), Name (Asc)</button>
             </div>
 
-            <h3>⏱️ LIMIT（records数制限）</h3>
+            <h3>⏱️ LIMIT (Result Count Restriction)</h3>
             <div class="button-group">
                 <button onclick="presetQuery('SELECT * FROM users LIMIT 2')">First 2 Users</button>
                 <button onclick="presetQuery('SELECT * FROM products ORDER BY price DESC LIMIT 3')">Top 3 Most Expensive Products</button>
                 <button onclick="presetQuery('SELECT * FROM users LIMIT 1 OFFSET 1')">Second User</button>
             </div>
 
-            <h3>✨ DISTINCT（重複排除）</h3>
+            <h3>✨ DISTINCT (Remove Duplicates)</h3>
             <div class="button-group">
                 <button onclick="presetQuery('SELECT DISTINCT age FROM users')">Distinct User Ages (No Duplicates)</button>
                 <button onclick="presetQuery('SELECT DISTINCT user_id FROM orders')">User IDs that Made Orders</button>
             </div>
 
-            <h3>🔍 WHERE条records（様々な演算子）</h3>
+            <h3>🔍 WHERE Conditions (Various Operators)</h3>
             <div class="button-group">
                 <button onclick="presetQuery('SELECT * FROM users WHERE age > 25')">Users Aged 25 or Older</button>
                 <button onclick="presetQuery('SELECT * FROM products WHERE price BETWEEN 5000 AND 20000')">Products Priced 5000-20000</button>
@@ -332,12 +332,12 @@
                 <button onclick="presetQuery('SELECT * FROM users WHERE id IN (SELECT user_id FROM orders) AND age > 25')">Users 25+ who made orders</button>
             </div>
 
-            <h3>📊 集計（GROUP BY）</h3>
+            <h3>📊 Aggregation (GROUP BY)</h3>
             <div class="button-group">
                 <button onclick="presetQuery('SELECT user_id, COUNT(*) as order_count FROM orders GROUP BY user_id')">Order Count per User</button>
             </div>
 
-            <h3>🔍 EXISTS（サブクエリ）</h3>
+            <h3>🔍 EXISTS (Subqueries)</h3>
             <div class="button-group">
                 <button onclick="presetQuery('SELECT * FROM users WHERE EXISTS (SELECT 1 FROM orders WHERE orders.user_id = users.id)')">Users Who Made Orders</button>
                 <button onclick="presetQuery('SELECT * FROM users WHERE NOT EXISTS (SELECT 1 FROM orders WHERE orders.user_id = users.id)')">Users Who Did NOT Make Orders</button>
@@ -350,7 +350,7 @@
             </div>
         </div>
 
-        <!-- データベース管理セクション -->
+        <!-- Database Management Section -->
         <div class="section">
             <h2>データベース管理</h2>
             <div class="button-group">
