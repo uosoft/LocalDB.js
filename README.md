@@ -405,16 +405,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - UNION and UNION ALL support
 - localStorage persistence
 
-## Roadmap
-
-- [ ] Transaction support
-- [ ] Indexing for performance
-- [ ] More aggregate functions
-- [ ] Window functions
-- [ ] Enhanced error messages
-- [ ] Query builder API
-- [ ] Data export (JSON, CSV)
-
 ## Credits
 
 Created as an educational tool for learning SQL in JavaScript environments.
