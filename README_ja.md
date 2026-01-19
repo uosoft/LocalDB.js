@@ -49,16 +49,6 @@ MITライセンスの下で公開されています。詳細は[LICENSE](LICENSE
 </script>
 ```
 
-### NPM（公開予定）
-```bash
-npm install localdb
-```
-
-```javascript
-const LocalDB = require('localdb');
-const db = new LocalDB('myapp');
-```
-
 ## クイックスタート
 
 ### テーブルを作成する
@@ -292,6 +282,14 @@ CREATE TABLE users (
   age INTEGER
 )
 ```
+
+### データ型
+| 型 | 説明 | 例 |
+|------|-------------|---------|
+| `INTEGER` | 整数 | `42`, `-10`, `0` |
+| `TEXT` | 文字列 | `'Hello'`, `'John Doe'` |
+| `REAL` | 浮動小数点数 | `3.14`, `-0.5` |
+| `BOOLEAN` | 真偽値 | `TRUE`, `FALSE` |
 
 ### INSERT
 ```sql

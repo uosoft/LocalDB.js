@@ -49,16 +49,6 @@ A lightweight, in-browser local database system with standard SQL syntax support
 </script>
 ```
 
-### NPM (if published)
-```bash
-npm install localdb
-```
-
-```javascript
-const LocalDB = require('localdb');
-const db = new LocalDB('myapp');
-```
-
 ## Quick Start
 
 ### Create a Table
@@ -292,6 +282,14 @@ CREATE TABLE users (
   age INTEGER
 )
 ```
+
+### Data Types
+| Type | Description | Example |
+|------|-------------|---------|
+| `INTEGER` | Whole numbers | `42`, `-10`, `0` |
+| `TEXT` | Character strings | `'Hello'`, `'John Doe'` |
+| `REAL` | Floating-point numbers | `3.14`, `-0.5` |
+| `BOOLEAN` | True/false values | `TRUE`, `FALSE` |
 
 ### INSERT
 ```sql
